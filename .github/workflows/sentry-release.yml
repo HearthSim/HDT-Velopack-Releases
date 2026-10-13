@@ -1,0 +1,28 @@
+name: Sentry Release
+
+on:
+  release:
+    types: [released]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      TAG_NAME: ${{ github.event.release.tag_name }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+      SENTRY_ENVIRONMENT: Velopack
+
+    steps:
+      # the release is created by the Squirrel and Velopack builds in Hearthstone-Deck-Tracker, which compose
+      # the name from AssemblyName and VersionPrefix, and finalized by HDT-Releases. The tag here carries the
+      # same version, prefixed.
+      - name: Create Sentry Deploy
+        run: npx @sentry/cli@2 deploys new --release "HearthstoneDeckTracker@${TAG_NAME#v}" --env "$SENTRY_ENVIRONMENT" --url "$RELEASE_URL"
+        env:
+          RELEASE_URL: ${{ github.event.release.html_url }}
