@@ -85,6 +85,8 @@ async function run() {
 
 	const version = tagName.slice(1);
 	await downloadFile("releases.win.json");
+	// legacy feed for Squirrel clients migrating to Velopack
+	await downloadFile("RELEASES");
 	await downloadFile("HDT-Installer.exe");
 	// the first release has no previous package to build a delta against
 	await downloadFile(`HearthstoneDeckTracker-${version}-delta.nupkg`, {
